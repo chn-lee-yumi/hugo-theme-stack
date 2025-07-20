@@ -26,6 +26,7 @@
     {{ $showReadingTime := .Params.readingTime | default (.Site.Params.article.readingTime) }}
     {{ $showDate := not .Date.IsZero }}
     {{ $showFooter := or $showDate $showReadingTime }}
+    {{ $showTags := or (not .Params.tags) (eq (len .Params.tags) 0)}}
     {{ if $showFooter }}
     <footer class="article-time">
         {{ if $showDate }}
@@ -46,6 +47,24 @@
             </div>
         {{ end }}
     </footer>
+    {{ end }}
+
+    {{ if not $showTags }}
+        <footer class="article-tags">
+            <div>
+                {{ partial "helper/icon" "tag" }}
+                {{ $tags := .GetTerms "tags" }}
+                {{ $count := len $tags }}
+                {{ range $index, $tag := $tags }}
+                    {{ if $index }}, {{ end }} <!-- 只有在不是第一个标签时添加逗号 -->
+                    <a href="{{ $tag.Page.Permalink }}">{{ $tag.LinkTitle }}</a> <!-- 添加链接 -->
+                    {{ if eq $index 4 }} <!-- 当索引为 4 时（第五个标签） -->
+                        {{ if gt $count 5 }}... {{ end }} <!-- 如果标签数量大于 5，显示省略号 -->
+                        {{ break }} <!-- 跳出循环 -->
+                    {{ end }}
+                {{ end }}
+            </div>
+        </footer>
     {{ end }}
 
     {{ if .IsTranslated }}
